@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>41</ID>
+      <Description>"TWEAK • Game • Change items stock limit from 99 to 255"</Description>
+      <Color>00FF00</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+ Game      : FFX.exe
+ Version   : 1.00
+ Date      : 2024-01-19
+ Author    : NikoKV
+
+ [i] Action: change items stock limit from 99 to 255
+}
+
+[ENABLE]
+alloc(newmem,32)
+label(returnhere)
+label(exit)
+
+newmem:
+movzx esi,byte ptr [edi+013D0B5C]
+push FF
+jmp "FFX.exe"+3905FF
+
+exit:
+jmp returnhere
+
+"FFX.exe"+3905F6:
+jmp newmem
+nop 2
+returnhere:
+
+[DISABLE]
+dealloc(newmem)
+"FFX.exe"+3905F6:
+db 0F B6 B7 5C 0B 3D 01
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5746</ID>
+      <Description>"└ without activation stock max will become =99"</Description>
+      <Color>C0C0C0</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5743</ID>
+      <Description>"[i] file page: https://www.nexusmods.com/finalfantasyxx2hdremaster/mods/186"</Description>
+      <Color>C08080</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5719</ID>
+      <Description>"[i] created by NikoKV // v1.00"</Description>
+      <Color>BFBFBF</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>-- script taken from here:
+-- link: https://forum.cheatengine.org/viewtopic.php?p=5779651
+-- author: gibberishh
+local proc = "FFX.exe"
+function Launch()
+  if not getProcessIDFromProcessName(proc) then
+    if io.popen("if exist "..proc.." (echo 1)"):read() then -- looks for game exe in same folder
+      shellExecute(proc) -- launches game
+      sleep(1000)
+    else
+      messageDialog(proc.." is not available in this folder. Open the table from the same folder as the game or start the game first.",mtError,mbOK)
+      return
+    end
+  end
+  local ticks = 0
+  local maxTicks = 5000 -- keeps waiting until the process is available or so many milliseconds have elapsed
+  local tick = 100
+  while process ~= proc and ticks &lt; maxTicks do
+    openProcess(proc)
+    sleep(tick)
+    ticks = ticks + tick
+  end
+  if process ~= proc then
+    messageDialog(proc.." is not running. Game not attached.",mtError,mbOK)
+    return
+  else
+    getAddressList().getMemoryRecord(0).Active = true
+  end
+end
+
+Launch()
+
+</LuaScript>
+</CheatTable>
